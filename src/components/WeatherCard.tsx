@@ -8,20 +8,20 @@ interface IWeatherCard {
 }
 
 export default function WeatherCard({ chosenLocation }: IWeatherCard) {
-    if (chosenLocation.name !== "") {
+    if (chosenLocation.name === "") {
         return (
-            <Card className="card marginRight" style={{ width: '300px' }}>
+            <Card className="card" style={{  display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <p><em>No Location chosen</em></p>
+            </Card>
+        )
+    } else {
+        return (
+            <Card className="card marginRight">
                 <p>{chosenLocation.name}</p>
                 <Divider />
                 <Grid style={{ minHeight: '100%', width: '100%' }}>
                     <Typography style={{ marginTop: 10 }}>Weather Forecast: {chosenLocation.forecast}</Typography>
                 </Grid>
-            </Card>
-        )
-    } else {
-        return (
-            <Card className="card marginRight" style={{ width: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <p><em>No Location chosen</em></p>
             </Card>
         )
     }

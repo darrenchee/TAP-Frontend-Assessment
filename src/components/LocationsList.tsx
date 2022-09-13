@@ -11,7 +11,7 @@ interface ILocationList {
 export default function LocationsList({ locations, chosenLocation, setChosenLocation }: ILocationList) {
     if (locations.length === 0) {
         return (
-            <Card className="card marginRight" style={{ width: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Card className="card marginRight" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <p><em>Date/time not provided</em></p>
             </Card>
         );
@@ -32,9 +32,9 @@ export default function LocationsList({ locations, chosenLocation, setChosenLoca
                     {
                         locations.map((locationData) => {
                             return (
-                                <ListItem key={locationData.name} onClick={() => setChosenLocation(locationData)}>
+                                <ListItem key={locationData.camera_id} onClick={() => setChosenLocation(locationData)}>
                                     <Grid container style={{ backgroundColor: 'white', width: '100%', height: '100%', alignItems: 'center' }}>
-                                        <Radio checked={chosenLocation.name === locationData.name} size="small" />
+                                        <Radio checked={chosenLocation.camera_id === locationData.camera_id} size="small" />
                                         <Typography>{locationData.name}</Typography>
                                         <Divider />
                                     </Grid>

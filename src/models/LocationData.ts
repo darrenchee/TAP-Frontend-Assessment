@@ -1,8 +1,6 @@
 export default interface Location {
+    camera_id: number,
     name: string,
-    label_location: {
-        latitude: number,
-        longitude: number
-    },
     forecast: string,
+    imageLink: string
 }
