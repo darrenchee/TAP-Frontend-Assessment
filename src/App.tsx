@@ -10,8 +10,6 @@ import ScreenshotDisplay from './components/ScreenshotDisplay';
 import LocationData from './models/LocationData';
 
 import locationsComparator from './comparators/LocationsComparator';
-import latComparator from './comparators/LatComparator';
-import longComparator from './comparators/LongComparator';
 
 const dummyLocation: LocationData = {
   camera_id: 0,
@@ -85,7 +83,7 @@ function App() {
       const trafficResponse = await axios.get(`https://api.data.gov.sg/v1/transport/traffic-images?date_time=${date_time}`);
       const weatherResponse = await axios.get(`https://api.data.gov.sg/v1/environment/2-hour-weather-forecast?date_time=${date_time}`);
       const trafficData = trafficResponse.data.items[0].cameras;
-      const locationData = weatherResponse.data.area_metadata.sort(latComparator);
+      const locationData = weatherResponse.data.area_metadata;
       const forecastData = weatherResponse.data.items[0].forecasts;
       const locationArray = [];
       for (let i = 0; i < trafficData.length; i++) {

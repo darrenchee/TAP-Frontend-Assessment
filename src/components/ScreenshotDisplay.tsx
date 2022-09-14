@@ -16,7 +16,7 @@ export default function ScreenshotDisplay({ imageLink }: IScreenshotDisplay) {
     } else {
         return (
             <Card className="card marginRight" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                <p><em>No Image Found!</em></p>
+                <p><em>No location selected yet!</em></p>
             </Card>
         )
     }
