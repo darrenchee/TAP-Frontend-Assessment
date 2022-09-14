@@ -11,6 +11,7 @@ import LocationData from './models/LocationData';
 
 import locationsComparator from './comparators/LocationsComparator';
 import latComparator from './comparators/LatComparator';
+import longComparator from './comparators/LongComparator';
 
 const dummyLocation: LocationData = {
   camera_id: 0,
@@ -26,21 +27,50 @@ function App() {
   const [time, setTime] = React.useState<string>("");
   const [isValid, setIsValid] = React.useState<boolean>(false);
 
-  // any fields as they are taken directly from the API
+  /* 
+    Retrieves the camera's district and forecast by taking the first camera that has both
+    the next lowest latitude and longitude values as compared to that retrieved in the 
+    districts area array
+  */
   function getCameraData(camera: any, districtsArray: any, forecastData: any) {
     const cameraData = {
       cameraDistrict: "",
       forecast: "",
     };
     for (let i = 0; i < districtsArray.length; i++) {
-      if (camera.location.latitude > districtsArray[i].label_location.latitude) {
-        cameraData.cameraDistrict = districtsArray[i].name;
+      if (camera.location.latitude < districtsArray[i].label_location.latitude) {
+        // Remove all districts with latitiude values higher than that of the camera, except the one right above
+        const filteredDistricts = [...districtsArray]
+        .slice(0, i + 1)
+        .sort(longComparator);
+
+        // Search through the filtered districts array for the district which is just greater than the camera's longitude
+        for (let j = 0; j < filteredDistricts.length; j++) {
+          if (camera.location.longitude < districtsArray[j].label_location.longitude) {
+            cameraData.cameraDistrict = filteredDistricts[j].name;
+            break;
+          }
+        }
+
+        // If no longitude values matched the search criteria in the filtered list, we assume the initial district was the correct one
+        if (cameraData.cameraDistrict === "") {
+          cameraData.cameraDistrict = districtsArray[i].name;
+        }
+
         break;
       }
     }
-    for (let j = 0; j < districtsArray.length; j++) {
-      if (forecastData[j].area === cameraData.cameraDistrict) {
-        cameraData.forecast = forecastData[j].forecast;
+
+    // EDGE CASE: Hardcoded woodlands to cameras with latitude values greater than all provided district locations
+    if (cameraData.cameraDistrict === "") {
+      cameraData.cameraDistrict = districtsArray[districtsArray.length - 2].name;
+    }
+
+    // Assign the forecast to the camera's district
+    for (let k = 0; k < districtsArray.length; k++) {
+      if (forecastData[k].area === cameraData.cameraDistrict) {
+        cameraData.forecast = forecastData[k].forecast;
+        break;
       }
     }
     return cameraData;
