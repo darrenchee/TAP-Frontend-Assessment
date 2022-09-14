@@ -27,43 +27,45 @@ function App() {
   const [time, setTime] = React.useState<string>("");
   const [isValid, setIsValid] = React.useState<boolean>(false);
 
+  function getDistance(cameraLat: number, cameraLong: number, districtLat: number, districtLong: number) {
+    const latDiff = Math.abs(cameraLat - districtLat);
+    const longDiff = Math.abs(cameraLong - districtLong);
+
+    return Math.sqrt(Math.pow(latDiff, 2) + Math.pow(longDiff, 2));
+  }
+
   /* 
-    Retrieves the camera's district and forecast by taking the first camera that has both
-    the next lowest latitude and longitude values as compared to that retrieved in the 
-    districts area array
+    Function to retrieve the camera's district and weather forcast.
+    The function assigns the camera to a district using the following means:
+      We get the diagonal distance between the camera and the district's reference point.
+      The diagonal distance is calculated using pythagoras' theorem where the height and breadth
+      is the difference between the camera's and district's latitude and longitude values respectively.
+    Once we have mapped the cameras to districts, we map the weather forecast to districts.
   */
   function getCameraData(camera: any, districtsArray: any, forecastData: any) {
     const cameraData = {
       cameraDistrict: "",
       forecast: "",
     };
+    let minDistance = Number.MAX_VALUE;
+    let index = -1;
+
+    // Gets the min diagonal distance between camera and district reference point
     for (let i = 0; i < districtsArray.length; i++) {
-      if (camera.location.latitude < districtsArray[i].label_location.latitude) {
-        // Remove all districts with latitiude values higher than that of the camera, except the one right above
-        const filteredDistricts = [...districtsArray]
-        .slice(0, i + 1)
-        .sort(longComparator);
-
-        // Search through the filtered districts array for the district which is just greater than the camera's longitude
-        for (let j = 0; j < filteredDistricts.length; j++) {
-          if (camera.location.longitude < districtsArray[j].label_location.longitude) {
-            cameraData.cameraDistrict = filteredDistricts[j].name;
-            break;
-          }
-        }
-
-        // If no longitude values matched the search criteria in the filtered list, we assume the initial district was the correct one
-        if (cameraData.cameraDistrict === "") {
-          cameraData.cameraDistrict = districtsArray[i].name;
-        }
-
-        break;
+      const distance = getDistance(
+        camera.location.latitude,
+        camera.location.longitude,
+        districtsArray[i].label_location.latitude,
+        districtsArray[i].label_location.longitude
+      );
+      if (distance < minDistance) {
+        minDistance = distance;
+        index = i;
       }
     }
 
-    // EDGE CASE: Hardcoded woodlands to cameras with latitude values greater than all provided district locations
-    if (cameraData.cameraDistrict === "") {
-      cameraData.cameraDistrict = districtsArray[districtsArray.length - 2].name;
+    if (index !== -1) {
+      cameraData.cameraDistrict = districtsArray[index].name;
     }
 
     // Assign the forecast to the camera's district
